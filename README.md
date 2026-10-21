@@ -357,27 +357,16 @@ for (i = 0; i < 5; i++) {
 
 ---
 
-## Team Members
+## Team Members and Contributions
 
-| Roll Number | Name | Role |
-|---|---|---|
-| 67 | Maria Rose Johny | Team Leader |
-| 43 | Jithu Joseph | Team Member |
-| 59 | Kevin Kanniyakonil Biju | Team Member |
-| 37 | Irene Tessa Seban | Team Member |
-| 8 | Daniya Dennis | Team Member |
-| 57 | Karthik Raj | Team Member |
-
-### Contributions
-
-| Member | Contribution |
-|---|---|
-| Maria Rose Johny | Team leadership and coordination |
-| Jithu Joseph | C compiler source code development |
-| Kevin Kanniyakonil Biju | Application interface development |
-| Irene Tessa Seban | Project report preparation — Part 1 |
-| Daniya Dennis | Project report preparation — Part 2 |
-| Karthik Raj | PPT Part 1 preparation and GitHub repository management |
+| Member | Name | Responsibility | Contribution |
+|---|---|---|---|
+| Member 1 | Maria Rose Johny | C Source Code | Develop the compiler in C, including lexical analysis, syntax validation for `for`, `while`, and `do-while` loops, AST-style output, basic semantic checks, and error handling. |
+| Member 2 | Jithu Joseph | Application Interface | Design the application interface with a code editor, Compile button, and output sections for tokens, AST, and errors. Integrate the interface with the C compiler and test the application. |
+| Member 3 | Irene Tessa Seban | Project Report — Part 1 | Prepare the abstract, introduction, problem statement, objectives, system architecture, CFG for all three loops, grammar production rules, and grammar transformations. |
+| Member 4 | Daniya Dennis | Project Report — Part 2 | Prepare lexical and syntax analysis sections, AST explanation, semantic checks, test cases with expected outputs, screenshots, results, limitations, and conclusion. Combine both parts into the complete report. |
+| Member 5 | Karthik Raj | PPT — Part 1 and GitHub | Prepare the first half of the presentation covering the introduction, objectives, problem statement, system architecture, CFG, and grammar transformations. Create the GitHub repository and upload the initial source code and grammar files. |
+| Member 6 | Kevin Kanniyakonil Biju | PPT — Part 2, Demo and GitHub | Prepare the second half of the presentation covering implementation, AST, semantic checks, test results, and conclusion. Coordinate the live demo, prepare `README.md`, and verify that all project files are uploaded to GitHub. |
 
 ---
 
