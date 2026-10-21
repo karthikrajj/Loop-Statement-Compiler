@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loop Compiler — C Loop Syntax Analyzer</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo-mark">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+            </div>
+            <div class="header-titles">
+                <h1 class="app-title">Loop Compiler</h1>
+                <p class="app-subtitle">C Loop Syntax Analyzer</p>
+            </div>
+        </div>
+
+        <div class="header-center">
+            <!-- Compiler Integration Mode Pill -->
+            <div id="compilerModeBadge" class="mode-badge mode-checking" title="Checking compiler connection status...">
+                <span class="mode-dot"></span>
+                <span id="compilerModeText" class="mode-text">Connecting...</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <!-- Theme Toggle -->
+            <button id="themeToggleBtn" class="icon-btn" title="Toggle Light/Dark Theme" aria-label="Toggle Theme">
+                <svg id="moonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg id="sunIcon" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+
+            <!-- Guide / About Button -->
+            <button id="infoModalBtn" class="btn btn-secondary btn-sm" title="Compiler Architecture & Guide">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>Docs</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="workspace">
+        <!-- Left Panel: Code Editor -->
+        <section class="panel editor-panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <span class="panel-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"></polyline>
+                            <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                    </span>
+                    <span class="panel-title">C Source Editor</span>
+                    <span id="lineColIndicator" class="badge-subtle">Ln 1, Col 1</span>
+                </div>
+
+                <div class="editor-controls">
+                    <!-- Example Selector Dropdown -->
+                    <div class="select-wrapper">
+                        <select id="exampleSelect" class="form-select" aria-label="Select C Loop Example">
+                            <option value="" disabled selected>Load Example Code...</option>
+                            <optgroup label="Valid Loop Programs">
+                                <option value="for_loop">Valid 'for' Loop</option>
+                                <option value="while_loop">Valid 'while' Loop</option>
+                                <option value="do_while_loop">Valid 'do-while' Loop</option>
+                                <option value="nested_loops">Nested Loops (for + while)</option>
+                            </optgroup>
+                            <optgroup label="Syntax Error Examples">
+                                <option value="missing_semicolon">Error: Missing Semicolon</option>
+                                <option value="mismatched_braces">Error: Mismatched Braces</option>
+                                <option value="invalid_condition">Error: Invalid Loop Condition</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <button id="clearCodeBtn" class="btn btn-secondary btn-sm" title="Clear Editor (Ctrl+L)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        <span>Clear</span>
+                    </button>
+
+                    <button id="copyCodeBtn" class="btn btn-secondary btn-sm" title="Copy C Source">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>Copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Code Editor Component with Line Numbers -->
+            <div class="editor-container" id="editorContainer">
+                <div class="line-numbers" id="lineNumbers">1</div>
+                <div class="editor-body">
+                    <textarea 
+                        id="codeEditor" 
+                        class="code-textarea" 
+                        spellcheck="false" 
+                        placeholder="// Enter or paste your C loop program here...&#10;// Example:&#10;#include <stdio.h>&#10;&#10;int main() {&#10;    for (int i = 0; i < 5; i++) {&#10;        printf(&quot;%d\n&quot;, i);&#10;    }&#10;    return 0;&#10;}"
+                        autocapitalize="off" 
+                        autocomplete="off"></textarea>
+                </div>
+            </div>
+
+            <!-- Editor Action Bar -->
+            <div class="editor-footer">
+                <div class="footer-left">
+                    <span id="charCount" class="footer-meta">0 lines, 0 chars</span>
+                </div>
+                <div class="footer-right">
+                    <button id="compileBtn" class="btn btn-primary" title="Compile C Code (Ctrl+Enter)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        <span>Compile</span>
+                        <kbd class="kbd-hint">Ctrl+Enter</kbd>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Panel: Compiler Output -->
+        <section class="panel output-panel">
+            <div class="panel-header">
+                <!-- Output Navigation Tabs -->
+                <div class="tabs" role="tablist">
+                    <button class="tab-btn active" data-tab="tokensTab" role="tab" aria-selected="true">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span>Tokens</span>
+                        <span id="tokensCountBadge" class="tab-count-badge">0</span>
+                    </button>
+
+                    <button class="tab-btn" data-tab="astTab" role="tab" aria-selected="false">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 3v12"></path>
+                            <circle cx="18" cy="6" r="3"></circle>
+                            <circle cx="6" cy="18" r="3"></circle>
+                            <path d="M18 9a9 9 0 0 1-9 9"></path>
+                        </svg>
+                        <span>AST</span>
+                    </button>
+
+                    <button class="tab-btn" data-tab="diagnosticsTab" role="tab" aria-selected="false">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        <span>Errors &amp; Warnings</span>
+                        <span id="errorsCountBadge" class="tab-count-badge badge-err">0</span>
+                    </button>
+
+                    <button class="tab-btn" data-tab="logsTab" role="tab" aria-selected="false">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="4 17 10 11 4 5"></polyline>
+                            <line x1="12" y1="19" x2="20" y2="19"></line>
+                        </svg>
+                        <span>Raw Logs</span>
+                    </button>
+                </div>
+
+                <!-- Status Indicator Tag -->
+                <div id="compilerStatusIndicator" class="status-indicator status-ready">
+                    <span class="status-dot"></span>
+                    <span id="compilerStatusLabel" class="status-label">Ready</span>
+                    <span id="execTimeBadge" class="exec-time hidden">0 ms</span>
+                </div>
+            </div>
+
+            <!-- Demo Mode Warning Banner (Shown only when in demo mode) -->
+            <div id="demoModeBanner" class="demo-mode-alert hidden">
+                <div class="alert-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+                <div class="alert-content">
+                    <strong>Demo Mode Active:</strong> Real compiler binary not detected at <code>compiler/compiler.exe</code>. Showing simulated analysis. Run <code>compiler/build.bat</code> to connect the real C compiler.
+                </div>
+            </div>
+
+            <!-- Tab Content Panels -->
+            <div class="tab-contents">
+                <!-- 1. Tokens Tab -->
+                <div id="tokensTab" class="tab-panel active" role="tabpanel">
+                    <div class="tab-toolbar">
+                        <div class="search-box">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" id="tokenFilterInput" placeholder="Filter tokens by lexeme or type..." class="form-input form-input-sm">
+                        </div>
+                        <div class="toolbar-actions">
+                            <button id="copyTokensBtn" class="btn btn-secondary btn-xs" title="Copy Tokens as JSON">
+                                <span>Copy JSON</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="tokens-table" id="tokensTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th style="width: 140px;">Token Type</th>
+                                    <th>Lexeme</th>
+                                    <th style="width: 80px;">Line</th>
+                                    <th style="width: 80px;">Column</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tokensTableBody">
+                                <tr class="empty-row">
+                                    <td colspan="5">
+                                        <div class="empty-state">
+                                            <p>Click <strong>Compile</strong> to inspect lexical tokens.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 2. AST Tab -->
+                <div id="astTab" class="tab-panel" role="tabpanel">
+                    <div class="tab-toolbar">
+                        <span class="meta-tag">Abstract Syntax Tree (AST)</span>
+                        <div class="toolbar-actions">
+                            <button id="copyAstBtn" class="btn btn-secondary btn-xs" title="Copy AST Tree">
+                                <span>Copy AST</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="ast-container">
+                        <pre id="astOutput" class="ast-pre"><code>Click "Compile" to generate the Abstract Syntax Tree.</code></pre>
+                    </div>
+                </div>
+
+                <!-- 3. Errors and Warnings Tab -->
+                <div id="diagnosticsTab" class="tab-panel" role="tabpanel">
+                    <div id="diagnosticsContainer" class="diagnostics-container">
+                        <div class="empty-state">
+                            <p>Click <strong>Compile</strong> to perform syntax and semantic validation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Raw Logs Tab -->
+                <div id="logsTab" class="tab-panel" role="tabpanel">
+                    <div class="tab-toolbar">
+                        <span class="meta-tag">Compiler Subprocess Raw Output</span>
+                        <div class="toolbar-actions">
+                            <button id="copyLogsBtn" class="btn btn-secondary btn-xs">
+                                <span>Copy Logs</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="logs-container">
+                        <div class="log-section">
+                            <div class="log-header">Standard Output (stdout)</div>
+                            <pre id="rawStdout" class="log-pre"><code>(No compilation output yet)</code></pre>
+                        </div>
+                        <div class="log-section">
+                            <div class="log-header">Standard Error (stderr)</div>
+                            <pre id="rawStderr" class="log-pre"><code>(No error stream output)</code></pre>
+                        </div>
+                        <div class="log-meta-bar" id="logMetaBar">
+                            <span>Exit Code: —</span>
+                            <span>Time: —</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Info / Guide Modal -->
+    <div id="infoModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <h2 id="modalTitle" class="modal-title">C Loop Compiler Architecture &amp; Integration</h2>
+                    <p class="modal-desc">Overview for students, educators, and compiler team members</p>
+                </div>
+                <button id="closeModalBtn" class="icon-btn" aria-label="Close modal">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>1. Compiler Pipeline Stages</h3>
+                <div class="pipeline-grid">
+                    <div class="pipeline-card">
+                        <h4>1. Lexical Analysis</h4>
+                        <p>Scans C source code character-by-character to tokenize keywords (<code>for</code>, <code>while</code>, <code>do</code>), identifiers, numeric constants, strings, operators, and delimiters.</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <h4>2. Syntax Parsing</h4>
+                        <p>Implements a Recursive Descent parser verifying C grammar rules, loop parenthesization, clause sequencing, and nested block matching.</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <h4>3. AST Construction</h4>
+                        <p>Builds a hierarchical tree representing Program &rarr; Function &rarr; Loop &rarr; Condition &rarr; Loop Body statements.</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <h4>4. Semantic Checks</h4>
+                        <p>Detects assignment inside condition (<code>i = 5</code> vs <code>i == 5</code>), empty conditions, and infinite loop patterns.</p>
+                    </div>
+                </div>
+
+                <h3>2. How to Connect Your Real C Compiler</h3>
+                <p>This web interface is designed with a plug-and-play adapter layer (<code>compiler_adapter.py</code>):</p>
+                <ol class="guide-steps">
+                    <li>Place your compiler source code in <code>compiler/compiler.c</code>.</li>
+                    <li>Compile the executable:
+                        <pre><code>cd compiler
+clang -std=c99 -O2 compiler.c -o compiler.exe
+# Or with GCC:
+gcc -std=c99 -O2 compiler.c -o compiler.exe
+# Or run:
+build.bat</code></pre>
+                    </li>
+                    <li>The Flask backend automatically detects <code>compiler/compiler.exe</code> and immediately activates <strong>Real C Compiler Mode</strong>!</li>
+                    <li>If the binary is absent, the backend falls back to <strong>Demo Mode</strong>, clearly marked with warning badges so you never confuse simulated output with real compilation.</li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button id="modalOkBtn" class="btn btn-primary">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <script src="/script.js"></script>
+</body>
+</html>
